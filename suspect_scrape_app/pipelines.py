@@ -11,7 +11,7 @@ class SuspectPipeline(object):
     # def __init__(self):
     #     sesh = load_suspects()
     def process_item(self, item, spider):
-        #sesh = load_suspects()
+        counter = 0
         sesh = spider.sesh
         #suspect = Suspect(name=item['name'], leaverid=item['ident'], role=item['role'], include='Yes', firm=item['firm'], location=item['location'], link=item['link'])
         print("ITEM'S ROLE VALUE: ", item['role'])
@@ -36,8 +36,10 @@ class SuspectPipeline(object):
                 print('trying...')
                 sesh.add(suspect)
                 sesh.commit()
+                counter += 1
             except IntegrityError:
                 print('except....', item['name'])
+        print('Database Entries: ', counter)
         return item
 
     # def close_spider(self, spider):

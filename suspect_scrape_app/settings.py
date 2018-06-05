@@ -18,6 +18,7 @@ def get_con_string():
     db='d4k3frt6kjv0rf'
     url = url.format(user, password, host, port, db)
     return url
+
 ITEM_PIPELINES = {
     'suspect_scrape_app.pipelines.SuspectPipeline': 300,
     }

@@ -1,3 +1,3 @@
-#source $Jeff/svirt/bin/activate
-#cd ~/scraptest
-#scrapy crawl suspects
+cd ~/scraptest
+source svirt/bin/activate
+scrapy crawl suspects
