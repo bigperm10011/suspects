@@ -10,8 +10,8 @@ from suspect_scrape_app.items import TrackItem
 from helpers import load_tables, remove_html_markup
 #################### Spider Description ####################
 #grabs 5 leavers sorted by the last time they were scraped
-#uses their linkedin profile link as a google search term
-#scrapes relevant details
+#collects possible suspects after google searching their name & specifying linkedin
+#scrapes relevant details and + to db after filtering duplicates
 ############################################################
 class QuotesSpider(scrapy.Spider):
     name = "suspects"
