@@ -8,13 +8,15 @@ from suspect_scrape_app import settings
 from sqlalchemy.orm import mapper, sessionmaker
 from suspect_scrape_app.items import TrackItem
 from helpers import load_tables, remove_html_markup
-
+#################### Spider Description ####################
+#grabs 5 leavers sorted by the last time they were scraped
+#uses their linkedin profile link as a google search term
+#scrapes relevant details
+############################################################
 class QuotesSpider(scrapy.Spider):
     name = "suspects"
     sesh, Suspect, Leaver = load_tables()
     lvr = sesh.query(Leaver).filter_by(status='Lost', updated='No').order_by(Leaver.timestamp).limit(5).all()
-
-
     slinks = sesh.query(Suspect).all()
     link_list = []
     for s in slinks:
@@ -30,10 +32,7 @@ class QuotesSpider(scrapy.Spider):
         else:
             raise CloseSpider('All Leavers Have Suspects')
     def parse(self, response):
-
-        #for i in response.xpath('//*[@id="ires"]/ol/div[@class="g"]'):
         for i in response.xpath('//*[@id="ires"]/ol/div[@class="g"]'):
-        #for i in response.xpath('//*[@id="ires"]/ol/div[@class="g"]'):
             item = TrackItem()
             link_string = str(i.xpath('div/div[1]/cite').extract())
             stage_link = remove_html_markup(link_string).strip('[').strip(']').strip("\'")
@@ -68,13 +67,4 @@ class QuotesSpider(scrapy.Spider):
                         item['role'] = None
                         item['firm'] = None
 
-
-                #xtrct = str(i.xpath('h3/a/@href').extract())
-                #item['link'] = re.search('q=(.*)&(amp;)?sa', xtrct)
-                #text = response.xpath('/a').extract()
-                #item['details'] = re.sub('<[^<]+?>', '', text)
-                #item['details'] = response.xpath('/a').extract()
                 yield item
-#//*[@id="ires"]/ol/div[1]/div/div[1]/cite/text()[2]
-#//*[@id="ires"]/ol/div[1]/div/div[2]
-#\xa0-\xa0

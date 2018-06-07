@@ -1,3 +1,4 @@
+
 import scrapy
 import re
 import datetime
@@ -8,7 +9,7 @@ from suspect_scrape_app import settings
 from sqlalchemy.orm import mapper, sessionmaker
 from suspect_scrape_app.items import TrackItem
 from helpers import load_tables, remove_html_markup
-
+##########for spider scrape testing purposes only! ###########
 class QuotesSpider(scrapy.Spider):
     name = "testing"
     sesh, Suspect, Leaver = load_tables()
