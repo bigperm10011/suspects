@@ -32,39 +32,44 @@ class QuotesSpider(scrapy.Spider):
         else:
             raise CloseSpider('All Leavers Have Suspects')
     def parse(self, response):
-        for i in response.xpath('//*[@id="ires"]/ol/div[@class="g"]'):
-            item = TrackItem()
-            link_string = str(i.xpath('div/div[1]/cite').extract())
-            stage_link = remove_html_markup(link_string).strip('[').strip(']').strip("\'")
-            name_placeholder = i.xpath('h3/a/b/text()').extract()
-            item['name'] = name_placeholder[0].strip('[').strip(']')
-            item['ident'] = response.meta['lid']
-            if 'https://www.linkedin.com/pub/dir/' in stage_link or 'site:www.linkedin.com' in name_placeholder[0]:
-                pass
-            else:
-                item['link'] = stage_link
-                deet = i.xpath('div/div[2]/text()').extract()
-                if len(deet) == 1:
-                    deets = deet[0].replace(u'\xa0-\xa0', u'-')
-                    deet_lst = deets.split('-')
-                    print('DEET  LIST VALUE: ', deet_lst[1])
-                    #print('!!!!!!!!!!', len(deet_lst))
-                    if len(deet_lst) == 3:
-                        try:
-                            item['location'] = deet_lst[0]
-                        except:
+        try:
+            for i in response.xpath('//*[@id="ires"]/ol/div[@class="g"]'):
+                item = TrackItem()
+                link_string = str(i.xpath('div/div[1]/cite').extract())
+                stage_link = remove_html_markup(link_string).strip('[').strip(']').strip("\'")
+                name_placeholder = i.xpath('h3/a/b/text()').extract()
+                item['name'] = name_placeholder[0].strip('[').strip(']')
+                item['ident'] = response.meta['lid']
+                if 'https://www.linkedin.com/pub/dir/' in stage_link or 'site:www.linkedin.com' in name_placeholder[0]:
+                    pass
+                else:
+                    item['link'] = stage_link
+                    deet = i.xpath('div/div[2]/text()').extract()
+                    if len(deet) == 1:
+                        deets = deet[0].replace(u'\xa0-\xa0', u'-')
+                        deet_lst = deets.split('-')
+                        print('DEET  LIST VALUE: ', deet_lst[1])
+                        #print('!!!!!!!!!!', len(deet_lst))
+                        if len(deet_lst) == 3:
+                            try:
+                                item['location'] = deet_lst[0]
+                            except:
+                                item['location'] = None
+                            try:
+                                item['role'] = deet_lst[1]
+                            except:
+                                item['role'] = None
+                            try:
+                                item['firm'] = deet_lst[2]
+                            except:
+                                item['firm'] = None
+                        else:
                             item['location'] = None
-                        try:
-                            item['role'] = deet_lst[1]
-                        except:
                             item['role'] = None
-                        try:
-                            item['firm'] = deet_lst[2]
-                        except:
                             item['firm'] = None
-                    else:
-                        item['location'] = None
-                        item['role'] = None
-                        item['firm'] = None
-
-                yield item
+                    item['status'] = 'Success'
+                    yield item
+        except:
+            item = TrackItem()
+            item['status'] = 'Fail'
+            yield item

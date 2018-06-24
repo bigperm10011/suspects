@@ -10,3 +10,4 @@ class TrackItem(scrapy.Item):
     details = scrapy.Field()
     testing = scrapy.Field()
     ident = scrapy.Field()
+    status = scrapy.Field()
