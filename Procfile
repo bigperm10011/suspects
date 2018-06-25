@@ -1,1 +1,1 @@
-web: scrapyd
+worker: python app.py
