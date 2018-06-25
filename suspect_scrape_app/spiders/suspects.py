@@ -21,6 +21,11 @@ class QuotesSpider(scrapy.Spider):
     link_list = []
     for s in slinks:
         link_list.append(s.link)
+        
+    def __init__(self):
+        self.update_settings = []
+        pass
+
     def start_requests(self, sesh=sesh, Leaver=Leaver, lvr=lvr):
         if len(lvr) > 0:
             for l in lvr:
