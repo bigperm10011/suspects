@@ -3,7 +3,8 @@ import sqlalchemy
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy import create_engine, MetaData, Table
 from sqlalchemy.orm import mapper, sessionmaker
-from helpers import load_tables
+from helpers import load_tables, gen_html, send_mail
+import datetime
 
 #processes spider items into postgres db
 class SuspectPipeline(object):
@@ -19,6 +20,8 @@ class SuspectPipeline(object):
                 suspect = spider.Suspect()
                 suspect.name=item['name']
                 suspect.leaverid=item['ident']
+                ts_format = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                suspect.timestamp = ts_format
                 try:
                     suspect.role=item['role']
                 except:
@@ -46,3 +49,17 @@ class SuspectPipeline(object):
             return item
         else:
             return None
+    def close_spider(self, spider):
+        sesh = spider.sesh
+        susps = sesh.query(spider.Suspect).filter_by(include='Yes').all()
+        today = datetime.date.today()
+        added = []
+        for s in susps:
+            when = s.timestamp
+            date = when.date()
+            if date == today:
+                added.append(s)
+        if len(added) > 0:
+            html = gen_html(added)
+            resp_code = send_mail(html)
+            print(resp_code)

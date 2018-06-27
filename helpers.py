@@ -4,6 +4,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import mapper, sessionmaker
 from sqlalchemy.ext.automap import automap_base
+import sendgrid
+import os
+from sendgrid.helpers.mail import *
 
 #loads db tables from postgres
 def load_tables():
@@ -42,3 +45,40 @@ def remove_html_markup(s):
                 out = out + c
 
     return out
+
+def gen_html(added):
+    html = """\
+        <!DOCTYPE html><html lang="en"><head>SAR Suspects Added Today</head><body><table border='1'>
+        <thead><tr><th>Name</th><th>Firm</th><th>Role</th><th>Location</th><th>Link</th></tr></thead>"""
+
+    for l in added:
+        html = html + "<tr>"
+        html = html + "<td>" + l.name + "</td>"
+        try:
+            html = html + "<td>" + l.firm + "</td>"
+        except:
+            html = html + "<td>None</td>"
+        try:
+            html = html + "<td>" + l.role + "</td>"
+        except:
+            html = html + "<td>None</td>"
+        try:
+            html = html + "<td>" + l.location + "</td>"
+        except:
+            html = html + "<td>None</td>"
+        try:
+            html = html + '<td><a target="_blank" href="'+ l.link + ' ">LinkedIn</a></td></tr>'
+        except:
+            html = html + '<td><a target="_blank" href=None">None</a></td></tr>'
+    html = html + "</table></body></html>"
+    return html
+
+def send_mail(body):
+    sg = sendgrid.SendGridAPIClient(apikey=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("jdbuhrman@gmail.com")
+    subject = "SAR Suspects Added Today"
+    to_email = Email("jbuhrman2@bloomberg.net")
+    content = Content("text/html", body)
+    mail = Mail(from_email, subject, to_email, content)
+    response = sg.client.mail.send.post(request_body=mail.get())
+    return response.status_code
