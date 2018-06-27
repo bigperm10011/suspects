@@ -55,10 +55,13 @@ class SuspectPipeline(object):
         today = datetime.date.today()
         added = []
         for s in susps:
-            when = s.timestamp
-            date = when.date()
-            if date == today:
-                added.append(s)
+            try:
+                when = s.timestamp
+                date = when.date()
+                if date == today:
+                    added.append(s)
+            except:
+                pass
         if len(added) > 0:
             html = gen_html(added)
             resp_code = send_mail(html)
