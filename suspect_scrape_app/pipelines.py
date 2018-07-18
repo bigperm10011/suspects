@@ -30,11 +30,11 @@ class SuspectPipeline(object):
                 try:
                     suspect.firm=item['firm']
                 except:
-                    suspect.firm=None
+                    suspect.firm= None
                 try:
                     suspect.location=item['location']
                 except:
-                    suspect.location=None
+                    suspect.location= None
                 suspect.link=item['link']
                 lvr = sesh.query(spider.Leaver).filter_by(id=item['ident']).one()
                 lvr.updated='Yes'
@@ -63,6 +63,9 @@ class SuspectPipeline(object):
             except:
                 pass
         if len(added) > 0:
-            html = gen_html(added)
-            resp_code = send_mail(html)
-            print(resp_code)
+            try:
+                html = gen_html(added)
+                resp_code = send_mail(html)
+                print(resp_code)
+            except:
+                pass
