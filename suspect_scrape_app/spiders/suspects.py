@@ -30,6 +30,8 @@ class QuotesSpider(scrapy.Spider):
                 lid = l.id
                 string = str('https://www.google.com/search?q=' + l.name + ' ' + 'site:www.linkedin.com/in/' + ' ' + 'language:en')
                 url = string
+                l.timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+                sesh.commit()
 
                 yield scrapy.Request(url=url, callback=self.parse, meta={'lid': l.id, 'name': l.name})
         else:
@@ -81,6 +83,7 @@ class QuotesSpider(scrapy.Spider):
                     salvage_string = list2string(st_class)
                     print('st class converted to string: ', salvage_string)
                     cleaned_str = clean_string(salvage_string, name)
+                    cleaned_str = cleaned_str.strip()
                     print('st string filtered: ', cleaned_str)
                     item = TrackItem()
                     item['name'] = name
@@ -92,7 +95,11 @@ class QuotesSpider(scrapy.Spider):
                     else:
                         item['role'] = role1
                     if firm1 == None:
-                        item['firm'] = cleaned_str.strip()
+                        if len(cleaned_str) > 100:
+                            print(">>Cleaned string too long for db. Reducing to: ", cleaned_str[:99])
+                            item['firm'] = cleaned_str[:99]
+                        else:
+                            item['firm'] = cleaned_str
                     else:
                         item['firm'] = firm1
                     score = score_name(item['name'], db_name)
